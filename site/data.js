@@ -2,6 +2,25 @@
 window.CLINIC = {
   whatsapp: "919360401654",
 
+  /* Per-doctor booking. Days: 0 = Sunday … 6 = Saturday. Times in minutes from midnight.
+     Source: clinic signboard. TODO: confirm with the clinic. */
+  doctors: {
+    ortho: {
+      name: "Dr. C. Srinivasacholan",
+      short: "Dr. Srinivasacholan",
+      days: [1, 2, 3, 4, 5], from: 17 * 60, to: 22 * 60, slot: 15,
+      fee: "General consultation ₹400, pay at the clinic",
+      purposes: ["Bones & joints consultation", "Follow-up visit", "Physiotherapy session", "Bone density camp", "Second opinion"]
+    },
+    derma: {
+      name: "Dr. G.P. Rekha Cholan",
+      short: "Dr. Rekha Cholan",
+      days: [1, 2, 3, 4, 5], from: 18 * 60, to: 20 * 60, slot: 15,
+      fee: "Pay at the clinic",
+      purposes: ["Skin & hair consultation", "Follow-up visit", "Cosmetic procedure", "Child's skin problem"]
+    }
+  },
+
   /* Opening hours by day (0 = Sunday … 6 = Saturday), minutes from midnight.
      Source: clinic signboard — Ortho Mon–Fri 5–10 pm, Derma Mon–Fri 6–8 pm.
      TODO: confirm weekend / morning hours with the clinic. */
@@ -65,9 +84,4 @@ window.CLINIC = {
       `<tr class="note"><td colspan="2">${esc(C.hoursNote)}</td></tr>`;
   }
 
-  // Booking buttons pre-select the concern
-  document.querySelectorAll("[data-concern]").forEach(a => a.addEventListener("click", () => {
-    const sel = document.getElementById("f-concern");
-    if (sel) sel.value = a.dataset.concern;
-  }));
 })();

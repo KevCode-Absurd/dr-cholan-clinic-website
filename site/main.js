@@ -52,15 +52,12 @@
 
   /* ---------- Symptom finder ---------- */
   const answer = $("#finder-answer");
+  const PURPOSE_FOR = { "Skin & hair": "Skin & hair consultation", "Physiotherapy": "Physiotherapy session", "Bone density camp": "Bone density camp" };
   const showAnswer = (chip, animate) => {
     $$(".chip[data-k]").forEach(c => c.setAttribute("aria-pressed", c === chip));
     const d = (CLINIC.finder || {})[chip.dataset.k];
     if (!d || !answer) return;
-    answer.innerHTML = `<span class="who">${d.who}</span><b>${d.title}</b><p>${d.text}</p><a href="#book">Book this visit</a>`;
-    answer.querySelector("a").addEventListener("click", () => {
-      const sel = $("#f-concern");
-      if (sel) sel.value = d.dept;
-    });
+    answer.innerHTML = `<span class="who">${d.who}</span><b>${d.title}</b><p>${d.text}</p><a href="#book" data-doctor="${d.dept === "Skin & hair" ? "derma" : "ortho"}" data-purpose="${PURPOSE_FOR[d.dept] || "Bones & joints consultation"}">Book this visit</a>`;
     if (animate && !reduce && window.gsap) gsap.fromTo(answer.children, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .45, stagger: .04, ease: "power2.out" });
   };
   const chips = $$(".chip[data-k]");
@@ -113,25 +110,135 @@
     if (row) row.classList.add("today");
   }
 
-  /* ---------- Booking → WhatsApp ---------- */
+  /* ---------- Booking: per-doctor slots → WhatsApp ---------- */
+  const DOCS = CLINIC.doctors || {};
   const form = $("#book-form");
+  const strip = $("#date-strip");
+  const slotsEl = $("#slots");
+  const summary = $("#bk-summary");
+  const purposeSel = $("#f-purpose");
+  const DAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const fmtTime = m => { const h = Math.floor(m / 60), mm = m % 60; return `${((h + 11) % 12) + 1}:${String(mm).padStart(2, "0")} ${h >= 12 ? "pm" : "am"}`; };
+  const istNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+  const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const state = { doc: "ortho", offset: 0, date: null, time: null };
+  const WINDOW = 7, MAX_OFFSET = 21;
+
+  const slotsFor = (doc, d) => {
+    const D = DOCS[doc], out = [];
+    if (!D || !D.days.includes(d.getDay())) return out;
+    const now = istNow(), today = startOfDay(now).getTime() === startOfDay(d).getTime();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    for (let m = D.from; m + D.slot <= D.to; m += D.slot) out.push({ m, past: today && m <= nowMin + 15 });
+    return out;
+  };
+
+  const renderDates = () => {
+    const base = startOfDay(istNow());
+    let html = "";
+    for (let i = 0; i < WINDOW; i++) {
+      const d = new Date(base); d.setDate(base.getDate() + state.offset + i);
+      const avail = slotsFor(state.doc, d).some(s => !s.past);
+      const sel = !!state.date && d.getTime() === state.date.getTime();
+      const label = d.getTime() === base.getTime() ? "Today" : DAY[d.getDay()];
+      html += `<button type="button" role="radio" class="date-chip" data-t="${d.getTime()}" aria-checked="${sel}" ${avail ? "" : "disabled"} aria-label="${d.toDateString()}${avail ? "" : ", not available"}"><span>${label}</span><b>${d.getDate()}</b><small>${avail ? MON[d.getMonth()] : "Closed"}</small></button>`;
+    }
+    strip.innerHTML = html;
+    $("#date-prev").disabled = state.offset <= 0;
+    $("#date-next").disabled = state.offset >= MAX_OFFSET;
+  };
+
+  const groupOf = m => m < 12 * 60 ? "Morning" : m < 16 * 60 ? "Afternoon" : m < 20 * 60 ? "Evening" : "Night";
+  const renderSlots = () => {
+    if (!state.date) { slotsEl.innerHTML = `<p class="slot-empty">Pick a day to see open times.</p>`; return; }
+    const groups = {};
+    slotsFor(state.doc, state.date).forEach(s => (groups[groupOf(s.m)] = groups[groupOf(s.m)] || []).push(s));
+    const html = Object.keys(groups).map(g => `<div class="slot-group"><p>${g}</p><div class="slot-grid">${
+      groups[g].map(s => `<button type="button" class="slot" data-m="${s.m}" aria-pressed="${state.time === s.m}" ${s.past ? "disabled" : ""}>${fmtTime(s.m)}</button>`).join("")
+    }</div></div>`).join("");
+    slotsEl.innerHTML = html || `<p class="slot-empty">No open times on this day. Try another day or call 93604 01654.</p>`;
+  };
+
+  const renderSummary = () => {
+    const D = DOCS[state.doc];
+    const when = state.date && state.time != null
+      ? `${DAY[state.date.getDay()]}, ${state.date.getDate()} ${MON[state.date.getMonth()]} at ${fmtTime(state.time)}`
+      : "Choose a day and time above";
+    summary.innerHTML = `<img src="${state.doc === "derma" ? "img/doc-r-portrait.webp" : "img/doc-s-portrait.webp"}" alt=""><span><b>${D.name}</b><span>${when}</span><small>${D.fee}</small></span>`;
+  };
+
+  const renderPurposes = keep => {
+    const cur = keep || purposeSel.value;
+    purposeSel.innerHTML = DOCS[state.doc].purposes.map(p => `<option>${p}</option>`).join("");
+    if (DOCS[state.doc].purposes.includes(cur)) purposeSel.value = cur;
+  };
+
+  const firstOpenDate = () => {
+    const base = startOfDay(istNow());
+    for (let i = 0; i < MAX_OFFSET + WINDOW; i++) {
+      const d = new Date(base); d.setDate(base.getDate() + i);
+      if (slotsFor(state.doc, d).some(s => !s.past)) return { d, i };
+    }
+    return null;
+  };
+
+  const selectDoctor = (doc, purpose) => {
+    if (!DOCS[doc]) return;
+    state.doc = doc; state.time = null;
+    $$(".doc-opt").forEach(b => b.setAttribute("aria-checked", b.dataset.doc === doc));
+    const f = firstOpenDate();
+    state.date = f ? f.d : null;
+    state.offset = f ? Math.min(MAX_OFFSET, Math.floor(f.i / WINDOW) * WINDOW) : 0;
+    renderPurposes(purpose); renderDates(); renderSlots(); renderSummary();
+  };
+
+  if (strip && slotsEl && summary && purposeSel) {
+    $$(".doc-opt").forEach(b => b.addEventListener("click", () => selectDoctor(b.dataset.doc)));
+    $("#date-prev").addEventListener("click", () => { state.offset = Math.max(0, state.offset - WINDOW); renderDates(); });
+    $("#date-next").addEventListener("click", () => { state.offset = Math.min(MAX_OFFSET, state.offset + WINDOW); renderDates(); });
+    strip.addEventListener("click", e => {
+      const b = e.target.closest(".date-chip"); if (!b || b.disabled) return;
+      state.date = new Date(+b.dataset.t); state.time = null;
+      renderDates(); renderSlots(); renderSummary();
+    });
+    slotsEl.addEventListener("click", e => {
+      const b = e.target.closest(".slot"); if (!b || b.disabled) return;
+      state.time = +b.dataset.m;
+      $$(".slot", slotsEl).forEach(x => x.setAttribute("aria-pressed", x === b));
+      renderSummary();
+      const err = $(".err", form); if (err) err.textContent = "";
+    });
+    // Any "Book" link can preselect a doctor and purpose
+    document.addEventListener("click", e => {
+      const a = e.target.closest("[data-doctor]");
+      if (a) selectDoctor(a.dataset.doctor, a.dataset.purpose);
+    });
+    selectDoctor("ortho");
+  }
+
   if (form) {
     form.addEventListener("submit", e => {
       e.preventDefault();
       const f = new FormData(form);
       const name = (f.get("name") || "").trim();
-      const phone = (f.get("phone") || "").trim();
+      const phone = (f.get("phone") || "").replace(/[\s-]/g, "").replace(/^(\+91|91|0)(?=\d{10}$)/, "");
       const err = $(".err", form);
-      if (!name) { err.textContent = "Add your name so the clinic knows who to expect."; $("#f-name").focus(); return; }
-      if (phone && !/^[+\d][\d\s-]{7,}$/.test(phone)) { err.textContent = "Check the phone number — use digits only, like 98400 12345."; $("#f-phone").focus(); return; }
+      if (!state.date || state.time == null) { err.textContent = "Choose a day and a time slot first."; slotsEl.scrollIntoView({ block: "center" }); return; }
+      if (!name) { err.textContent = "Add the patient's name."; $("#f-name").focus(); return; }
+      if (!/^[6-9]\d{9}$/.test(phone)) { err.textContent = "Enter a 10-digit mobile number, like 98400 12345."; $("#f-phone").focus(); return; }
       err.textContent = "";
+      const D = DOCS[state.doc];
       const lines = [
-        `Hello Dr. Cholan's Clinic, I'd like to book a visit.`,
-        `Name: ${name}`,
-        phone && `Phone: ${phone}`,
-        `For: ${f.get("concern")}`,
-        f.get("day") && `Preferred day: ${f.get("day")}`,
-        f.get("note") && `Note: ${f.get("note").trim()}`
+        "Hello Dr. Cholan's Clinic, I'd like to book an appointment.",
+        `Doctor: ${D.name}`,
+        `Date: ${DAY[state.date.getDay()]}, ${state.date.getDate()} ${MON[state.date.getMonth()]} ${state.date.getFullYear()}`,
+        `Time: ${fmtTime(state.time)}`,
+        `Purpose: ${f.get("purpose")}`,
+        `Patient: ${name}`,
+        `Mobile: ${phone}`,
+        f.get("gender") && `Gender: ${f.get("gender")}`,
+        (f.get("note") || "").trim() && `Notes: ${f.get("note").trim()}`
       ].filter(Boolean).join("\n");
       window.open(`https://wa.me/${CLINIC.whatsapp}?text=${encodeURIComponent(lines)}`, "_blank", "noopener");
     });
@@ -142,7 +249,6 @@
 
   /* ================= Motion ================= */
   if (reduce || !window.gsap) {
-    // still keep the stacked-card rail working
     return;
   }
   gsap.registerPlugin(ScrollTrigger);
