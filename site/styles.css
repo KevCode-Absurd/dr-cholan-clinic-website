@@ -140,13 +140,13 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -0.035em; color: v
 @media (max-width: 900px) {
   .hero { padding: 8px 8px 0; }
   .hero-card { flex-direction: column; align-items: stretch; min-height: 0; background: var(--soft); border-radius: 22px; }
-  .hero-card > img { position: relative; width: 100%; height: auto; aspect-ratio: 4 / 3; object-position: 58% 20%; -webkit-mask-image: none; mask-image: none; }
+  .hero-card > img { position: relative; width: 100%; height: auto; aspect-ratio: 4 / 3; object-position: 100% 20%; -webkit-mask-image: none; mask-image: none; }
   .hero-copy { padding: 24px 20px; max-width: none; }
   .hero-copy .lede { margin: 14px 0 22px; }
 }
 @media (max-width: 560px) {
   .t-hero { font-size: 38px; }
-  .hero-card > img { aspect-ratio: 1 / 1; object-position: 60% 25%; }
+  .hero-card > img { aspect-ratio: 1 / 1; object-position: 78% 25%; }
   .hero-ctas { flex-direction: column; }
   .hero-ctas .btn { width: 100%; }
 }
