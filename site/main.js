@@ -242,24 +242,6 @@
     gsap.fromTo($$(".face", statement), { scale: 0, rotate: -20 }, { scale: 1, rotate: 0, duration: .8, ease: "back.out(2)", stagger: .12, scrollTrigger: { trigger: statement, start: "top 80%" } });
   }
 
-  // Why-choose: stacked sticky cards — earlier cards recede
-  const cards = $$(".why-card");
-  const dots = $$(".why-rail span");
-  if (cards.length && window.matchMedia("(min-width: 881px)").matches) {
-    cards.forEach((card, i) => {
-      if (i < cards.length - 1) {
-        gsap.to(card, {
-          scale: .94, opacity: .55, ease: "none",
-          scrollTrigger: { trigger: cards[i + 1], start: "top 85%", end: "top 110px", scrub: true }
-        });
-      }
-      ScrollTrigger.create({
-        trigger: card, start: "top 60%", end: "bottom 40%",
-        onToggle: s => { if (s.isActive) dots.forEach((d, j) => d.classList.toggle("on", j === i)); }
-      });
-    });
-  }
-
   // Marquee
   $$(".marquee-track").forEach(t => {
     const w = t.scrollWidth / 2;

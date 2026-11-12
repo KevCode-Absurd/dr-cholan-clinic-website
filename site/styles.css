@@ -247,39 +247,34 @@ main > .sec:last-child { padding-bottom: var(--section); }
 
 /* ---------- Doctors ---------- */
 .docs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.doc { background: var(--surface); border-radius: var(--r-xl); overflow: hidden; display: grid; grid-template-columns: 0.9fr 1.1fr; }
+.doc { background: var(--surface); border-radius: var(--r-xl); overflow: hidden; display: grid; grid-template-columns: 1fr; }
 .doc > * { min-width: 0; }
-.doc-photo { position: relative; background: var(--soft); min-height: 100%; }
-.doc-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }
-.doc-body { padding: 26px 26px 28px; }
+.doc-photo { position: relative; background: var(--soft); aspect-ratio: 16 / 11; }
+.doc-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; }
+.doc-body { padding: 26px 28px 30px; }
 .doc-body .quals { font-size: 14.5px; color: var(--ink-2); margin: 4px 0 14px; }
-.doc-body > p:not(.kicker):not(.quals) { font-size: 15.5px; }
-.spec { list-style: none; padding: 14px 0 0; margin: 16px 0 0; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 4px 0; font-size: 14.5px; font-weight: 700; }
-.spec li:not(:last-child)::after { content: "·"; color: var(--violet); margin: 0 8px; }
-@media (max-width: 1080px) { .docs { grid-template-columns: 1fr; } }
-@media (max-width: 600px) {
-  .doc { grid-template-columns: 1fr; }
-  .doc-photo { aspect-ratio: 1 / 1; min-height: 0; }
+.doc-body > p:not(.kicker):not(.quals):not(.spec) { font-size: 16px; }
+.spec { padding-top: 14px; margin: 16px 0 0; border-top: 1px solid var(--line); font-size: 15px; font-weight: 600; }
+.spec span { display: block; font-size: 13.5px; font-weight: 700; color: var(--violet-ink); margin-bottom: 2px; }
+@media (max-width: 1080px) and (min-width: 641px) {
+  .docs { grid-template-columns: 1fr; }
+  .doc { grid-template-columns: .85fr 1.15fr; }
+  .doc-photo { aspect-ratio: auto; min-height: 100%; }
+}
+@media (max-width: 640px) {
+  .docs { grid-template-columns: 1fr; }
+  .doc-photo { aspect-ratio: 1 / 1; }
   .doc-body { padding: 22px 20px 24px; }
 }
 
-/* ---------- Why (stacked sticky cards) ---------- */
-.why { display: grid; grid-template-columns: 20px 1fr; gap: 24px; }
-.why-rail { position: sticky; top: 140px; align-self: start; display: grid; gap: 12px; justify-items: center; padding-top: 24px; }
-.why-rail span { width: 8px; height: 8px; border-radius: 50%; background: var(--violet); opacity: .25; transition: opacity .3s ease, transform .3s ease; }
-.why-rail span.on { opacity: 1; transform: scale(1.3); }
-.why-list { display: grid; gap: 16px; }
-.why-card { position: sticky; top: 100px; display: grid; grid-template-columns: 1fr 1fr; background: var(--surface); border-radius: var(--r-xl); overflow: hidden; box-shadow: 0 -12px 40px -30px rgba(40,20,110,.45); }
-.why-card > * { min-width: 0; }
-.why-card .img { aspect-ratio: 16 / 11; background: var(--soft); }
+/* ---------- Why (2x2 grid) ---------- */
+.why-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.why-card { display: flex; flex-direction: column; background: var(--surface); border-radius: var(--r-xl); overflow: hidden; }
+.why-card .img { aspect-ratio: 16 / 9; background: var(--soft); overflow: hidden; }
 .why-card .img img { width: 100%; height: 100%; object-fit: cover; }
-.why-card .txt { padding: clamp(22px, 3.5vw, 44px); display: flex; flex-direction: column; justify-content: center; }
-.why-card p { margin: 12px 0 0; }
-@media (max-width: 880px) {
-  .why { grid-template-columns: 1fr; }
-  .why-rail { display: none; }
-  .why-card { position: relative; top: 0; grid-template-columns: 1fr; }
-}
+.why-card .txt { padding: 24px 26px 28px; }
+.why-card p { margin: 10px 0 0; }
+@media (max-width: 760px) { .why-list { grid-template-columns: 1fr; } .why-card .txt { padding: 20px; } }
 
 /* ---------- Reviews ---------- */
 .reviews {
