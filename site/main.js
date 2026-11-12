@@ -52,20 +52,20 @@
 
   /* ---------- Symptom finder ---------- */
   const answer = $("#finder-answer");
-  $$(".chip[data-k]").forEach(chip => {
-    chip.addEventListener("click", () => {
-      $$(".chip[data-k]").forEach(c => c.setAttribute("aria-pressed", c === chip));
-      const d = (CLINIC.finder || {})[chip.dataset.k];
-      if (!d || !answer) return;
-      answer.innerHTML = `<span class="who">${d.who}</span><b>${d.title}</b><p>${d.text}</p><a href="#book" data-concern="${chip.textContent.trim()}">Book this visit</a>`;
-      const link = answer.querySelector("a");
-      link.addEventListener("click", () => {
-        const sel = $("#f-concern");
-        if (sel) sel.value = d.dept;
-      });
-      if (!reduce && window.gsap) gsap.fromTo(answer.children, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .45, stagger: .04, ease: "power2.out" });
+  const showAnswer = (chip, animate) => {
+    $$(".chip[data-k]").forEach(c => c.setAttribute("aria-pressed", c === chip));
+    const d = (CLINIC.finder || {})[chip.dataset.k];
+    if (!d || !answer) return;
+    answer.innerHTML = `<span class="who">${d.who}</span><b>${d.title}</b><p>${d.text}</p><a href="#book">Book this visit</a>`;
+    answer.querySelector("a").addEventListener("click", () => {
+      const sel = $("#f-concern");
+      if (sel) sel.value = d.dept;
     });
-  });
+    if (animate && !reduce && window.gsap) gsap.fromTo(answer.children, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .45, stagger: .04, ease: "power2.out" });
+  };
+  const chips = $$(".chip[data-k]");
+  chips.forEach(chip => chip.addEventListener("click", () => showAnswer(chip, true)));
+  if (chips[0]) showAnswer(chips[0], false); // default: knee pain
 
   /* ---------- Reviews carousel ---------- */
   const track = $(".reviews");
