@@ -57,7 +57,7 @@
       $$(".chip[data-k]").forEach(c => c.setAttribute("aria-pressed", c === chip));
       const d = (CLINIC.finder || {})[chip.dataset.k];
       if (!d || !answer) return;
-      answer.innerHTML = `<span class="who">${d.who}</span><b>${d.title}</b><p>${d.text}</p><a href="#book" data-concern="${chip.textContent.trim()}">Book a visit for this</a>`;
+      answer.innerHTML = `<span class="who">${d.who}</span><b>${d.title}</b><p>${d.text}</p><a href="#book" data-concern="${chip.textContent.trim()}">Book this visit</a>`;
       const link = answer.querySelector("a");
       link.addEventListener("click", () => {
         const sel = $("#f-concern");
@@ -151,6 +151,7 @@
   let lenis;
   if (window.Lenis) {
     lenis = new Lenis({ duration: 1.15, easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true });
+    window.lenis = lenis;
     lenis.on("scroll", ScrollTrigger.update);
     gsap.ticker.add(t => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
@@ -216,10 +217,6 @@
   });
 
   // Hero: image drifts as you scroll away
-  const heroImg = $(".hero-card > img");
-  if (heroImg) {
-    gsap.to(heroImg, { yPercent: 8, scale: 1.06, ease: "none", scrollTrigger: { trigger: ".hero-card", start: "top top", end: "bottom top", scrub: true } });
-  }
 
   // Mission statement: words ink in as you read
   const statement = $(".statement");

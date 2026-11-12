@@ -26,14 +26,14 @@ window.CLINIC = {
   hoursNote: "Orthopaedics 5 – 10 pm · Dermatology 6 – 8 pm",
 
   finder: {
-    knee:     { dept: "Bones & joints", who: "Orthopaedics + Physiotherapy", title: "Knee pain", text: "Most knee pain — from arthritis, a twist or a worn cartilage — improves with medicines, injections and physiotherapy. Replacement is considered only when the joint is badly worn." },
-    back:     { dept: "Bones & joints", who: "Orthopaedics + Physiotherapy", title: "Back or neck pain", text: "We check for disc, nerve or posture problems, then combine treatment with traction and targeted exercises. See us soon if pain spreads to an arm or leg, or causes numbness." },
-    fracture: { dept: "Bones & joints", who: "Orthopaedics", title: "Fracture or injury", text: "Adult and children's fractures, ligament tears and sports injuries — with plaster, keyhole surgery or fixation as needed, then rehab here to get you moving." },
-    shoulder: { dept: "Physiotherapy", who: "Orthopaedics + Physiotherapy", title: "Frozen or painful shoulder", text: "Usually treated without an operation — with medicines, an injection if needed, and a guided stretching programme to bring back movement." },
-    acne:     { dept: "Skin & hair", who: "Dermatology", title: "Acne or acne scars", text: "Active acne is treated first, then scars with peels, microneedling or laser — chosen for your skin type so it heals evenly." },
-    hair:     { dept: "Skin & hair", who: "Dermatology", title: "Hair fall", text: "We look for the cause — stress, thyroid, iron, hormones or genes — before treatment. PRP therapy can help suitable patients." },
-    pigment:  { dept: "Skin & hair", who: "Dermatology", title: "Pigmentation & dark spots", text: "Melasma, tanning and dark patches are treated with prescription creams, chemical peels and sun-care advice that suits Indian skin." },
-    bones:    { dept: "Bone density camp", who: "Orthopaedics", title: "Weak bones after 50", text: "Bone thinning (osteoporosis) has no pain until a fracture. A quick, painless bone density scan shows your risk so you can act early." }
+    knee:     { dept: "Bones & joints", who: "See Dr. Srinivasacholan, then physiotherapy", title: "Knee pain", text: "Arthritis, a twisted knee or worn cartilage usually improve with medicines, an injection and physiotherapy. Replacement is considered only when the joint is badly worn." },
+    back:     { dept: "Bones & joints", who: "See Dr. Srinivasacholan, then physiotherapy", title: "Back or neck pain", text: "He'll check for disc, nerve or posture problems and pair treatment with traction and exercises. Come in soon if the pain spreads down an arm or leg, or causes numbness." },
+    fracture: { dept: "Bones & joints", who: "See Dr. Srinivasacholan", title: "Fracture or injury", text: "Fractures in adults and children, ligament tears and sports injuries. Treatment may be a cast, keyhole surgery or fixation, followed by rehab at the clinic." },
+    shoulder: { dept: "Physiotherapy", who: "See Dr. Srinivasacholan, then physiotherapy", title: "Stiff or painful shoulder", text: "A frozen shoulder usually recovers without an operation. Expect medicines, an injection if needed and a guided stretching plan." },
+    acne:     { dept: "Skin & hair", who: "See Dr. Rekha Cholan", title: "Acne or acne scars", text: "Active acne is calmed first. Scars are then treated with peels, microneedling or laser, chosen for your skin type." },
+    hair:     { dept: "Skin & hair", who: "See Dr. Rekha Cholan", title: "Hair fall", text: "She'll look for the cause first: stress, thyroid, low iron, hormones or genes. PRP therapy can help suitable patients." },
+    pigment:  { dept: "Skin & hair", who: "See Dr. Rekha Cholan", title: "Dark spots & pigmentation", text: "Melasma, tanning and dark patches are treated with prescription creams, chemical peels and sun care that suits Indian skin." },
+    bones:    { dept: "Bone density camp", who: "Free bone density camp", title: "Weak bones after 50", text: "Bone thinning causes no pain until something breaks. A quick, painless scan shows your fracture risk so you can start treatment early." }
   },
 
   /* Real patient reviews from the clinic's website (lightly edited for spelling). */
@@ -55,14 +55,14 @@ window.CLINIC = {
   if (track) {
     track.innerHTML = C.reviews.map(r => {
       const ini = r.name.split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
-      return `<figure class="review"><blockquote>“${esc(r.text)}”</blockquote><figcaption><span class="avatar" aria-hidden="true">${ini}</span><span><b>${esc(r.name)}</b><span class="meta">${esc(r.doc)} patient</span></span></figcaption></figure>`;
+      return `<figure class="review"><blockquote>“${esc(r.text)}”</blockquote><figcaption><span class="avatar" aria-hidden="true">${ini}</span><span><b>${esc(r.name)}</b><span class="muted">${esc(r.doc)} patient</span></span></figcaption></figure>`;
     }).join("");
   }
 
   const tbody = document.querySelector("#hours-table tbody");
   if (tbody) {
     tbody.innerHTML = C.hoursTable.map(h => `<tr data-day="${h.day}"><td>${h.label}</td><td>${h.text}</td></tr>`).join("") +
-      `<tr><td colspan="2" class="meta">${esc(C.hoursNote)}</td></tr>`;
+      `<tr class="note"><td colspan="2">${esc(C.hoursNote)}</td></tr>`;
   }
 
   // Booking buttons pre-select the concern
