@@ -189,13 +189,9 @@ h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: -0.035em; color: v
 section { scroll-margin-top: 80px; }
 .sec, .sec.tight { padding: var(--section) 0 0; }
 main > .sec:last-child { padding-bottom: var(--section); }
-.head { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 48px; align-items: end; margin-bottom: var(--head-gap); }
-.head .lede { justify-self: end; max-width: 30em; }
-.head-row { display: flex; justify-content: space-between; align-items: end; gap: 20px; }
-@media (max-width: 860px) {
-  .head { grid-template-columns: 1fr; }
-  .head .lede { justify-self: start; }
-}
+.head { margin-bottom: var(--head-gap); max-width: 760px; }
+.head .lede { margin-top: 12px; max-width: 36em; }
+.head-row { display: flex; justify-content: space-between; align-items: end; gap: 20px; max-width: none; }
 
 /* ---------- Care tabs ---------- */
 .tabs { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 16px; max-width: 100%; }
