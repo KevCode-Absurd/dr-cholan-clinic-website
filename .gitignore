@@ -1,0 +1,5 @@
+.env
+.env.*
+assets/generated-v1/
+.DS_Store
+Thumbs.db
